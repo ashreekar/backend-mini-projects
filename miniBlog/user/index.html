@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>⚡ MiniPost - API Tester</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6 font-sans">
+
+  <!-- Title -->
+  <h1 class="text-4xl font-extrabold mb-8 tracking-wide">
+    ⚡ MiniPost <span class="text-blue-500">API Tester</span>
+  </h1>
+
+  <!-- Card -->
+  <div class="bg-gray-800/80 backdrop-blur p-6 rounded-xl shadow-lg w-full max-w-4xl border border-gray-700">
+
+    <!-- Request Controls -->
+    <div class="flex flex-col md:flex-row gap-3 mb-4">
+      <select id="method"
+        class="bg-gray-700 text-white px-4 py-2 rounded-md font-semibold">
+        <option>GET</option>
+        <option>POST</option>
+        <option>PUT</option>
+        <option>DELETE</option>
+      </select>
+
+      <input id="url" type="text" placeholder="Enter API URL"
+        class="flex-1 bg-gray-700 px-4 py-2 rounded-md outline-none focus:ring-2 focus:ring-blue-500">
+
+      <button id="sendBtn"
+        class="bg-blue-500 hover:bg-blue-600 transition px-6 py-2 rounded-md font-bold shadow-md">
+        Send 🚀
+      </button>
+    </div>
+
+    <!-- Body Editor -->
+    <div id="bodySection" class="hidden mb-6">
+      <h3 class="text-sm text-gray-400 mb-1">Request Body (JSON):</h3>
+      <textarea id="bodyInput"
+        class="w-full h-40 bg-gray-900 text-green-300 px-3 py-2 rounded-md font-mono text-sm outline-none focus:ring-2 focus:ring-green-500">
+{
+  "name": "Test"
+}
+      </textarea>
+    </div>
+
+    <!-- Response Viewer -->
+    <h3 class="text-lg font-semibold mb-2 text-green-400">Response:</h3>
+    <pre id="response"
+      class="bg-black/90 text-green-400 p-4 rounded-md overflow-auto max-h-[400px] text-sm font-mono border border-gray-700">
+// Response will appear here
+    </pre>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const methodSelect = document.getElementById("method");
+    const urlInput = document.getElementById("url");
+    const sendBtn = document.getElementById("sendBtn");
+    const bodySection = document.getElementById("bodySection");
+    const bodyInput = document.getElementById("bodyInput");
+    const responseBox = document.getElementById("response");
+
+    // Toggle body editor
+    methodSelect.addEventListener("change", () => {
+      if (methodSelect.value === "POST" || methodSelect.value === "PUT") {
+        bodySection.classList.remove("hidden");
+      } else {
+        bodySection.classList.add("hidden");
+      }
+    });
+
+    // Send API request
+    sendBtn.addEventListener("click", async () => {
+      const method = methodSelect.value;
+      const url = urlInput.value.trim();
+      const options = { method, headers: { "Content-Type": "application/json" } };
+
+      if (method !== "GET" && method !== "DELETE") {
+        options.body = bodyInput.value;
+      }
+
+      try {
+        const res = await fetch(url, options);
+        const data = await res.json().catch(() => res.text());
+        responseBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        responseBox.textContent = "❌ Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
